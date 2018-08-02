@@ -1,10 +1,11 @@
 """Fully vectorial finite-difference mode solver example."""
 
-import numpy as np as np
+import numpy as np
 import EMpy
 import matplotlib.pyplot as plt
 
-plt.rcParams['image.cmap'] = 'coolwarm'
+plt.rcParams["image.cmap"] = "coolwarm"
+
 
 def epsfunc(x_, y_):
     """Similar to ex_modesolver.py, but using anisotropic eps."""

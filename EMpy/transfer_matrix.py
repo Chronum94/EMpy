@@ -18,8 +18,6 @@ from scipy.linalg import inv
 from EMpy.utils import snell, norm
 from EMpy.constants import c, mu0
 
-# import Gnuplot
-
 
 class TransferMatrix(object):
 

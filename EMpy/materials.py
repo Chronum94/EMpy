@@ -9,7 +9,7 @@ from builtins import str
 from builtins import object
 from functools import partial
 
-import numpy
+import numpy as np
 from scipy.integrate import quad
 from EMpy.constants import eps0
 
@@ -47,7 +47,7 @@ class RefractiveIndex(object):
 
     n0_poly : list/tuple
         Use a polynomial rix dispersion function: provide the
-        polynomial coefficients to be evaluated by numpy.polyval.
+        polynomial coefficients to be evaluated by np.polyval.
          # sets the refractive index function as n = 9(wl**3) +
          # 5(wl**2) + 3(wl) + 1
          For example:
@@ -76,8 +76,8 @@ class RefractiveIndex(object):
                     n0_func=lambda wl: 1.887 + 0.01929/(wl*1e6)**2 +
                                        1.6662e-4/(wl*1e6)**4)
 
-        Your function should return a `numpy.array`, since it will be
-        passed a `numpy.array` of the wavelengths requested.  This
+        Your function should return a `np.array`, since it will be
+        passed a `np.array` of the wavelengths requested.  This
         conversion to `array` happens automatically if your function
         does math on the wavelength.
 
@@ -90,7 +90,12 @@ class RefractiveIndex(object):
     """
 
     def __init__(
-        self, n0_const=None, n0_poly=None, n0_smcoeffs=None, n0_known=None, n0_func=None
+        self,
+        n0_const: float = None,
+        n0_poly=None,
+        n0_smcoeffs=None,
+        n0_known: dict = None,
+        n0_func=None,
     ):
 
         if n0_const is not None:
@@ -113,36 +118,36 @@ class RefractiveIndex(object):
 
     @staticmethod
     def __from_const(n0, wls):
-        wls = numpy.atleast_1d(wls)
-        return n0 * numpy.ones_like(wls)
+        wls = np.atleast_1d(wls)
+        return n0 * np.ones_like(wls)
 
     @staticmethod
     def __from_poly(n0_poly, wls):
-        wls = numpy.atleast_1d(wls)
-        return numpy.polyval(n0_poly, wls) * numpy.ones_like(wls)
+        wls = np.atleast_1d(wls)
+        return np.polyval(n0_poly, wls) * np.ones_like(wls)
 
     @staticmethod
     def __from_sellmeier(n0_smcoeffs, wls):
-        wls = numpy.atleast_1d(wls)
+        wls = np.atleast_1d(wls)
         B1, B2, B3, C1, C2, C3 = n0_smcoeffs
-        return numpy.sqrt(
+        return np.sqrt(
             1.
             + B1 * wls ** 2 / (wls ** 2 - C1)
             + B2 * wls ** 2 / (wls ** 2 - C2)
             + B3 * wls ** 2 / (wls ** 2 - C3)
-        ) * numpy.ones_like(wls)
+        ) * np.ones_like(wls)
 
     @staticmethod
     def __from_function(n0_func, wls):
         # ensure wls is array
-        wls = numpy.atleast_1d(wls)
-        return n0_func(wls) * numpy.ones_like(wls)
+        wls = np.atleast_1d(wls)
+        return n0_func(wls) * np.ones_like(wls)
 
     @staticmethod
     def __from_known(n0_known, wls):
-        wls = numpy.atleast_1d(wls)
+        wls = np.atleast_1d(wls)
         # Note: we should interpolate...
-        return numpy.array([n0_known.get(wl, 0) for wl in wls])
+        return np.array([n0_known.get(wl, 0) for wl in wls])
 
     def __call__(self, wls):
         return self.get_rix(wls)
@@ -158,7 +163,7 @@ class ThermalOpticCoefficient(object):
 
     def TOC(self, T):
         if self.__data is not None:
-            return numpy.polyval(self.__data, T)
+            return np.polyval(self.__data, T)
         else:
             return 0.0
 
@@ -203,8 +208,8 @@ class IsotropicMaterial(Material):
         """Return the epsilon at T as a [3 x 3 x wls] array."""
         if T is None:
             T = self.toc.T0
-        tmp = numpy.eye(3)
-        return tmp[:, :, numpy.newaxis] * self.epsilon(wls, T)
+        tmp = np.eye(3)
+        return tmp[:, :, np.newaxis] * self.epsilon(wls, T)
 
     @staticmethod
     def isIsotropic():
@@ -218,7 +223,7 @@ class IsotropicMaterial(Material):
 
 class EpsilonTensor(object):
     def __init__(
-        self, epsilon_tensor_const=eps0 * numpy.eye(3), epsilon_tensor_known=None
+        self, epsilon_tensor_const=eps0 * np.eye(3), epsilon_tensor_known=None
     ):
         if epsilon_tensor_known is None:
             epsilon_tensor_known = {}
@@ -227,11 +232,11 @@ class EpsilonTensor(object):
 
     def __call__(self, wls):
         """Return the epsilon tensor as a [3 x 3 x wls.size] matrix."""
-        wls = numpy.atleast_1d(wls)
+        wls = np.atleast_1d(wls)
         if wls.size == 1:
             if wls.item() in self.epsilon_tensor_known:
-                return self.epsilon_tensor_known[wls.item()][:, :, numpy.newaxis]
-        return self.epsilon_tensor_const[:, :, numpy.newaxis] * numpy.ones_like(wls)
+                return self.epsilon_tensor_known[wls.item()][:, :, np.newaxis]
+        return self.epsilon_tensor_const[:, :, np.newaxis] * np.ones_like(wls)
 
 
 class AnisotropicMaterial(Material):
@@ -355,10 +360,10 @@ def get_10400_000_100(conc000):
     K33 = 20e-12  # elastic constant [N] (bend)
     q0 = 0  # chirality 2*pi/pitch
 
-    nO_electrical_ = numpy.interp(conc000, conc, epsO_electrical) ** .5
-    nE_electrical_ = numpy.interp(conc000, conc, epsE_electrical) ** .5
-    nO_ = numpy.interp(conc000, conc, epsO) ** .5
-    nE_ = numpy.interp(conc000, conc, epsE) ** .5
+    nO_electrical_ = np.interp(conc000, conc, epsO_electrical) ** .5
+    nE_electrical_ = np.interp(conc000, conc, epsE_electrical) ** .5
+    nO_ = np.interp(conc000, conc, epsO) ** .5
+    nE_ = np.interp(conc000, conc, epsE) ** .5
 
     return LiquidCrystal(
         "10400_000_100_" + str(conc000) + "_" + str(100 - conc000),

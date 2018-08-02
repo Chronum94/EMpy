@@ -5,7 +5,7 @@
 import EMpy
 import matplotlib.pyplot as plt
 
-plt.rcParams['image.cmap'] = 'coolwarm'
+plt.rcParams["image.cmap"] = "coolwarm"
 
 mat1 = EMpy.materials.IsotropicMaterial(
     "SiN", n0=EMpy.materials.RefractiveIndex(n0_const=1.97)

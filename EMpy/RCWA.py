@@ -19,6 +19,7 @@ __author__ = "Lorenzo Bolla"
 
 import scipy as S
 from scipy.linalg import toeplitz, inv, eig, solve as linsolve
+import numpy as np
 from numpy import pi
 
 from EMpy.utils import (
@@ -68,7 +69,7 @@ def dispersion_relation_extraordinary(kx, ky, k, nO, nE, c):
             "kx and ky must have the same length and c must have 3 components"
         )
 
-    kz = S.empty_like(kx)
+    kz = np.zeros_like(kx)
 
     for ii in range(0, kx.size):
 
@@ -76,7 +77,7 @@ def dispersion_relation_extraordinary(kx, ky, k, nO, nE, c):
         beta = kx[ii] / k * c[0] + ky[ii] / k * c[1]
 
         # coeffs
-        C = S.array(
+        C = np.array(
             [
                 nO ** 2 + c[2] ** 2 * alpha,
                 2. * c[2] * beta * alpha,
@@ -213,12 +214,12 @@ class IsotropicRCWA(RCWA):
 
         # grating vector (on the xz plane)
         # grating on the xy plane
-        K = 2 * pi / LAMBDA * S.array([S.sin(phi), 0., S.cos(phi)], dtype=complex)
+        K = 2 * pi / LAMBDA * np.array([S.sin(phi), 0., S.cos(phi)], dtype=complex)
 
         DE1 = S.zeros((nood, self.wls.size))
         DE3 = S.zeros_like(DE1)
 
-        dirk1 = S.array(
+        dirk1 = np.array(
             [S.sin(alpha) * S.cos(delta), S.sin(alpha) * S.sin(delta), S.cos(alpha)]
         )
 
@@ -491,16 +492,16 @@ class AnisotropicRCWA(RCWA):
         DEE1 = S.zeros_like(DEO1)
         DEE3 = S.zeros_like(DEO1)
 
-        c1 = S.array([1., 0., 0.])
-        c3 = S.array([1., 0., 0.])
+        c1 = np.array([1., 0., 0.])
+        c3 = np.array([1., 0., 0.])
         # grating on the xy plane
-        K = 2 * pi / LAMBDA * S.array([S.sin(phi), 0., S.cos(phi)], dtype=complex)
-        dirk1 = S.array(
+        K = 2 * pi / LAMBDA * np.array([S.sin(phi), 0., S.cos(phi)], dtype=complex)
+        dirk1 = np.array(
             [S.sin(alpha) * S.cos(delta), S.sin(alpha) * S.sin(delta), S.cos(alpha)]
         )
 
         # D polarization vector
-        u = S.array(
+        u = np.array(
             [
                 S.cos(psi) * S.cos(alpha) * S.cos(delta) - S.sin(psi) * S.sin(delta),
                 S.cos(psi) * S.cos(alpha) * S.sin(delta) + S.sin(psi) * S.cos(delta),

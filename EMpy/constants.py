@@ -15,11 +15,14 @@ Constants used in mathematics and electromagnetism.
 __author__ = "Lorenzo Bolla"
 
 from numpy import pi
+from scipy.constants import c, mu_0 as mu0, epsilon_0 as eps0, h, hbar as h_bar, k
 
-c = 299792458.
-mu0 = 4 * pi * 1e-7
-eps0 = 1. / (c ** 2 * mu0)
+__all__ = ["c", "mu0", "eps0", "h", "h_bar", "k"]
 
-h = 6.62606896e-34
-h_bar = h / (2 * pi)
-k = 1.3806504e-23
+# c = 299792458.
+# mu0 = 4 * pi * 1e-7
+# eps0 = 1. / (c ** 2 * mu0)
+#
+# h = 6.62606896e-34
+# h_bar = h / (2 * pi)
+# k = 1.3806504e-23
