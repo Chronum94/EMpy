@@ -1,6 +1,6 @@
 """Fully vectorial finite-difference mode solver example."""
 
-import numpy as np
+import numpy as np as np
 import EMpy
 import matplotlib.pyplot as plt
 

@@ -19,8 +19,8 @@ Materials may be called from another script like so:
     >>> nk.SiO(1.550)       
     : 1.448333
     
-You can pass/return multiple wavelengths/indices. They must in a numpy.array (not [list]), as so:
-    >>> nk.SiO(  numpy.array([1.550, 1.551, 1.552])  )       
+You can pass/return multiple wavelengths/indices. They must in a np.array (not [list]), as so:
+    >>> nk.SiO(  np.array([1.550, 1.551, 1.552])  )
     : array([ 1.4483336 ,  1.44832036,  1.44830712])
 
 -- OR --
@@ -240,7 +240,7 @@ def AlAs_interp(wl, k=False):
     http://www.filmetrics.com/refractive-index-database/AlAs/Aluminium-Arsenide
     M. Garriga, P. Lautenschlager, M. Cardona, and K. Ploog, Solid State Commun. 61, 157 (1987) (UV data) and S. Adachi, J. Appl. Phys. 58, R1 (1985) (Vis and NIR data)
     
-    Uses Numpy interpolation to return values - will raise error if requested wavelength is outside range.
+    Uses np interpolation to return values - will raise error if requested wavelength is outside range.
     
     Args:
         wl: wavelength in microns (float)
@@ -656,7 +656,7 @@ def GaAs_interp(wl, k=False):
     http://www.filmetrics.com/refractive-index-database/GaAs/Gallium-Arsenide
     Reference: J. B. Theeten, D. E. Aspnes, and R. P. H. Chang, J. Appl. Phys. 49, 6097 (1978)
     
-    Uses Numpy interpolation to return values - will raise error if requested wavelength is outside range.
+    Uses np interpolation to return values - will raise error if requested wavelength is outside range.
     
     Args:
         wl: wavelength in microns (float)

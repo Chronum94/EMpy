@@ -1,7 +1,7 @@
 """Rigorous Coupled Wave Analysis example."""
 
-import numpy
-import pylab
+import numpy as np
+import matplotlib.pyplot as plt
 
 import EMpy
 from EMpy.materials import (
@@ -28,7 +28,7 @@ SiN = AnisotropicMaterial(
     epsilon_tensor=EpsilonTensor(
         epsilon_tensor_const=EMpy.constants.eps0
         * EMpy.utils.euler_rotate(
-            numpy.diag(numpy.asarray([1.8550, 1.8750, 1.9130]) ** 2),
+            np.diag(np.asarray([1.8550, 1.8750, 1.9130]) ** 2),
             EMpy.utils.deg2rad(14),
             EMpy.utils.deg2rad(25),
             EMpy.utils.deg2rad(32),
@@ -42,35 +42,35 @@ EFF = IsotropicMaterial("EFF", n0=RefractiveIndex(n0_const=1.6))
 
 multilayer1 = EMpy.utils.Multilayer(
     [
-        EMpy.utils.Layer(EMpy.materials.Air, numpy.inf),
+        EMpy.utils.Layer(EMpy.materials.Air, np.inf),
         EMpy.utils.Layer(SiN, 226e-9),
         EMpy.utils.Layer(BPTEOS, 226e-9),
         EMpy.utils.BinaryGrating(SiN, BPTEOS, .659, LAMBDA, 123e-9),
         EMpy.utils.Layer(SiN, 219e-9),
         EMpy.utils.Layer(EMpy.materials.SiO2, 2188e-9),
-        EMpy.utils.Layer(EMpy.materials.Si, numpy.inf),
+        EMpy.utils.Layer(EMpy.materials.Si, np.inf),
     ]
 )
 
 multilayer2 = EMpy.utils.Multilayer(
     [
-        EMpy.utils.Layer(EMpy.materials.Air, numpy.inf),
+        EMpy.utils.Layer(EMpy.materials.Air, np.inf),
         EMpy.utils.Layer(SiN, 226e-9),
         EMpy.utils.Layer(BPTEOS, 226e-9),
         EMpy.utils.Layer(IsotropicMaterial(n0=RefractiveIndex(n0_const=1.6)), 123e-9),
         EMpy.utils.Layer(SiN, 219e-9),
         EMpy.utils.Layer(EMpy.materials.SiO2, 2188e-9),
-        EMpy.utils.Layer(EMpy.materials.Si, numpy.inf),
+        EMpy.utils.Layer(EMpy.materials.Si, np.inf),
     ]
 )
 
-wls = numpy.linspace(1.45e-6, 1.75e-6, 301)
+wls = np.linspace(1.45e-6, 1.75e-6, 301)
 
 solution1 = EMpy.RCWA.AnisotropicRCWA(multilayer1, alpha, delta, psi, phi, n).solve(wls)
 solution2 = EMpy.RCWA.AnisotropicRCWA(multilayer2, alpha, delta, psi, phi, n).solve(wls)
 
 um = 1e-6
-pylab.plot(
+plt.plot(
     # wls / um, solution1.DEO1[n, :], 'k.-',
     # wls / um, solution1.DEO3[n, :], 'r.-',
     wls / um,
@@ -88,9 +88,9 @@ pylab.plot(
     solution2.DEE3[n, :],
     "g--",
 )
-pylab.xlabel("wavelength [um]")
-pylab.ylabel("diffraction efficiency")
-pylab.legend(("DEO1", "DEO3", "DEE1", "DEE3"))
-pylab.axis("tight")
-pylab.ylim([0, 0.15])
-pylab.show()
+plt.xlabel("wavelength [um]")
+plt.ylabel("diffraction efficiency")
+plt.legend(("DEO1", "DEO3", "DEE1", "DEE3"))
+plt.axis("tight")
+plt.ylim([0, 0.15])
+plt.show()

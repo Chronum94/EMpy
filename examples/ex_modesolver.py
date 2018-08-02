@@ -1,5 +1,7 @@
 """Fully vectorial finite-difference mode solver example."""
 
+# takes ~4 seconds to run on a Ryzen 5 1600.
+
 import numpy as np
 import EMpy
 import matplotlib.pyplot as plt

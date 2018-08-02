@@ -1,21 +1,21 @@
-import numpy
+import numpy as np
 import EMpy
-import pylab
+import matplotlib.pyplot as plt
 
 # define the multilayer
 epsilon = [
-    1.0 ** 2 * EMpy.constants.eps0 * numpy.eye(3),
-    EMpy.constants.eps0 * numpy.diag([2.1, 2.0, 1.9]),
-    2.3 ** 2 * EMpy.constants.eps0 * numpy.eye(3),
-    4.3 ** 2 * EMpy.constants.eps0 * numpy.eye(3),
-    3.0 ** 2 * EMpy.constants.eps0 * numpy.eye(3),
+    1.0 ** 2 * EMpy.constants.eps0 * np.eye(3),
+    EMpy.constants.eps0 * np.diag([2.1, 2.0, 1.9]),
+    2.3 ** 2 * EMpy.constants.eps0 * np.eye(3),
+    4.3 ** 2 * EMpy.constants.eps0 * np.eye(3),
+    3.0 ** 2 * EMpy.constants.eps0 * np.eye(3),
 ]
 
-d = numpy.array([numpy.inf, 1e-6, 2.3e-6, 0.1e-6, numpy.inf])
+d = np.array([np.inf, 1e-6, 2.3e-6, 0.1e-6, np.inf])
 
 aniso_layers = EMpy.utils.Multilayer()
 for i in xrange(len(epsilon)):
-    eps = EMpy.materials.EpsilonTensor(epsilon[i] * numpy.eye(3))
+    eps = EMpy.materials.EpsilonTensor(epsilon[i] * np.eye(3))
     mat = EMpy.materials.AnisotropicMaterial("layer_%d" % i, eps)
     layer = EMpy.utils.Layer(mat, d[i])
     aniso_layers.append(layer)
@@ -23,7 +23,7 @@ for i in xrange(len(epsilon)):
 # define the planewave
 theta_inc_x = EMpy.utils.deg2rad(0.)
 theta_inc_y = 0.
-wls = numpy.linspace(1.4e-6, 1.7e-6, 100)
+wls = np.linspace(1.4e-6, 1.7e-6, 100)
 
 # solve
 tm = EMpy.transfer_matrix.AnisotropicTransferMatrix(
@@ -32,8 +32,8 @@ tm = EMpy.transfer_matrix.AnisotropicTransferMatrix(
 solution_aniso = tm.solve(wls)
 
 # plot
-pylab.figure()
-pylab.plot(
+plt.figure()
+plt.plot(
     wls,
     solution_aniso.R[0, 0, :],
     wls,
@@ -51,9 +51,9 @@ pylab.plot(
     wls,
     solution_aniso.T[1, 1, :],
 )
-pylab.legend(("Rss", "Rps", "Rsp", "Rpp", "Tss", "Tps", "Tsp", "Tpp"))
-pylab.title("Anisotropic Multilayer")
-pylab.xlabel("wavelength /m")
-pylab.ylabel("Power /dB")
-pylab.xlim(wls.min(), wls.max())
-pylab.show()
+plt.legend(("Rss", "Rps", "Rsp", "Rpp", "Tss", "Tps", "Tsp", "Tpp"))
+plt.title("Anisotropic Multilayer")
+plt.xlabel("wavelength /m")
+plt.ylabel("Power /dB")
+plt.xlim(wls.min(), wls.max())
+plt.show()
