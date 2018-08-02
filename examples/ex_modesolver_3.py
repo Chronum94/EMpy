@@ -1,13 +1,14 @@
 """Fully vectorial finite-difference mode solver example."""
 
-import numpy
+import numpy as np
 import EMpy
-import pylab
+import matplotlib.pyplot as plt
 
+plt.rcParams['image.cmap'] = 'coolwarm'
 
 def epsfunc(x_, y_):
     """Similar to ex_modesolver.py, but using anisotropic eps."""
-    eps = numpy.zeros((len(x_), len(y_), 5))
+    eps = np.zeros((len(x_), len(y_), 5))
     for ix, xx in enumerate(x_):
         for iy, yy in enumerate(y_):
             if abs(xx - 1.24e-6) <= .24e-6 and abs(yy - 1.11e-6) <= .11e-6:
@@ -23,8 +24,8 @@ def epsfunc(x_, y_):
 
 
 wl = 1.55e-6
-x = numpy.linspace(0, 2.48e-6, 125)
-y = numpy.linspace(0, 2.22e-6, 112)
+x = np.linspace(0, 2.48e-6, 125)
+y = np.linspace(0, 2.22e-6, 112)
 
 neigs = 2
 tol = 1e-8
@@ -34,14 +35,14 @@ solver = EMpy.modesolvers.FD.VFDModeSolver(wl, x, y, epsfunc, boundary).solve(
     neigs, tol
 )
 
-fig = pylab.figure()
+fig = plt.figure()
 fig.add_subplot(1, 3, 1)
-pylab.contourf(abs(solver.modes[0].Ex), 50)
-pylab.title("Ex")
+plt.contourf(abs(solver.modes[0].Ex), 50)
+plt.title("Ex")
 fig.add_subplot(1, 3, 2)
-pylab.contourf(abs(solver.modes[0].Ey), 50)
-pylab.title("Ey")
+plt.contourf(abs(solver.modes[0].Ey), 50)
+plt.title("Ey")
 fig.add_subplot(1, 3, 3)
-pylab.contourf(abs(solver.modes[0].Ez), 50)
-pylab.title("Ez")
-pylab.show()
+plt.contourf(abs(solver.modes[0].Ez), 50)
+plt.title("Ez")
+plt.show()

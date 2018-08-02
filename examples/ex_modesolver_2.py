@@ -1,7 +1,11 @@
 """Fully vectorial finite-difference mode solver example."""
 
+# Takes ~10 seconds to run on a Ryzen 5 1600.
+
 import EMpy
-import pylab
+import matplotlib.pyplot as plt
+
+plt.rcParams['image.cmap'] = 'coolwarm'
 
 mat1 = EMpy.materials.IsotropicMaterial(
     "SiN", n0=EMpy.materials.RefractiveIndex(n0_const=1.97)
@@ -40,14 +44,14 @@ boundary = "0000"
 solver = EMpy.modesolvers.FD.VFDModeSolver(wl, X, Y, epsfunc, boundary).solve(
     neigs, tol
 )
-fig = pylab.figure()
+fig = plt.figure()
 fig.add_subplot(1, 3, 1)
-pylab.contourf(abs(solver.modes[0].Ex), 50)
-pylab.title("Ex")
+plt.contourf(abs(solver.modes[0].Ex), 50)
+plt.title("Ex")
 fig.add_subplot(1, 3, 2)
-pylab.contourf(abs(solver.modes[0].Ey), 50)
-pylab.title("Ey")
+plt.contourf(abs(solver.modes[0].Ey), 50)
+plt.title("Ey")
 fig.add_subplot(1, 3, 3)
-pylab.contourf(abs(solver.modes[0].Ez), 50)
-pylab.title("Ez")
-pylab.show()
+plt.contourf(abs(solver.modes[0].Ez), 50)
+plt.title("Ez")
+plt.show()
