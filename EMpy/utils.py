@@ -8,7 +8,7 @@ from builtins import str
 from builtins import range
 from builtins import object
 
-__author__ = 'Lorenzo Bolla'
+__author__ = "Lorenzo Bolla"
 
 import numpy
 import EMpy.constants
@@ -52,8 +52,9 @@ class Layer(object):
             # anisotropic
             EPS = numpy.zeros((3, 3, 2 * hmax + 1), dtype=complex)
             EPS1 = numpy.zeros_like(EPS)
-            EPS[:, :, hmax] = numpy.squeeze(
-                self.mat.epsilonTensor(wl)) / EMpy.constants.eps0
+            EPS[:, :, hmax] = (
+                numpy.squeeze(self.mat.epsilonTensor(wl)) / EMpy.constants.eps0
+            )
             EPS1[:, :, hmax] = scipy.linalg.inv(EPS[:, :, hmax])
             return EPS, EPS1
 
@@ -100,24 +101,23 @@ class BinaryGrating(object):
             rix2 = self.mat2.n(wl)
             f = self.dc
             h = numpy.arange(-hmax, hmax + 1)
-            EPS = (rix1 ** 2 - rix2 ** 2) * f * \
-                numpy.sinc(h * f) + rix2 ** 2 * (h == 0)
-            EPS1 = (rix1 ** -2 - rix2 ** -2) * f * \
-                numpy.sinc(h * f) + rix2 ** -2 * (h == 0)
+            EPS = (rix1 ** 2 - rix2 ** 2) * f * numpy.sinc(h * f) + rix2 ** 2 * (h == 0)
+            EPS1 = (rix1 ** -2 - rix2 ** -2) * f * numpy.sinc(h * f) + rix2 ** -2 * (
+                h == 0
+            )
             return EPS, EPS1
         else:
             # anisotropic
             EPS = numpy.zeros((3, 3, 2 * hmax + 1), dtype=complex)
             EPS1 = numpy.zeros_like(EPS)
-            eps1 = numpy.squeeze(
-                self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
-            eps2 = numpy.squeeze(
-                self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps1 = numpy.squeeze(self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps2 = numpy.squeeze(self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
             f = self.dc
             h = numpy.arange(-hmax, hmax + 1)
             for ih, hh in enumerate(h):
-                EPS[:, :, ih] = (eps1 - eps2) * f * \
-                    numpy.sinc(hh * f) + eps2 * (hh == 0)
+                EPS[:, :, ih] = (eps1 - eps2) * f * numpy.sinc(hh * f) + eps2 * (
+                    hh == 0
+                )
                 EPS1[:, :, ih] = (
                     scipy.linalg.inv(eps1) - scipy.linalg.inv(eps2)
                 ) * f * numpy.sinc(hh * f) + scipy.linalg.inv(eps2) * (hh == 0)
@@ -128,8 +128,8 @@ class BinaryGrating(object):
 
         if self.isIsotropic():
             eps = EMpy.constants.eps0 * numpy.real(
-                self.mat1.n(wl) ** 2 * self.dc + self.mat2.n(wl) ** 2
-                * (1 - self.dc))
+                self.mat1.n(wl) ** 2 * self.dc + self.mat2.n(wl) ** 2 * (1 - self.dc)
+            )
         else:
             eps1 = self.mat1.epsilonTensor(wl)[2, 2, 0]
             eps2 = self.mat2.epsilonTensor(wl)[2, 2, 0]
@@ -140,7 +140,12 @@ class BinaryGrating(object):
     def __str__(self):
         """Return the description of a binary grating."""
         return "(%s, %s), dc: %g, pitch: %g, thickness: %g" % (
-            self.mat1, self.mat2, self.dc, self.pitch, self.thickness)
+            self.mat1,
+            self.mat2,
+            self.dc,
+            self.pitch,
+            self.thickness,
+        )
 
 
 class SymmetricDoubleGrating(object):
@@ -163,9 +168,11 @@ class SymmetricDoubleGrating(object):
 
     def isIsotropic(self):
         """Return True if all the materials are isotropic, False otherwise."""
-        return (self.mat1.isIsotropic() and
-                self.mat2.isIsotropic() and
-                self.mat3.isIsotropic())
+        return (
+            self.mat1.isIsotropic()
+            and self.mat2.isIsotropic()
+            and self.mat3.isIsotropic()
+        )
 
     def getEPSFourierCoeffs(self, wl, n, anisotropic=True):
         """Return the Fourier coefficients of eps and eps**-1, orders [-n,n]."""
@@ -180,53 +187,66 @@ class SymmetricDoubleGrating(object):
             f2 = self.dc2
             h = numpy.arange(-hmax, hmax + 1)
             N = len(h)
-            A = -N*f1 / 2.
-            B = N*f2 / 2.
+            A = -N * f1 / 2.
+            B = N * f2 / 2.
             EPS = (
-                rix3 ** 2 * (h == 0) + (rix1 ** 2 - rix3 ** 2) * f1 *
-                numpy.sinc(h * f1) * numpy.exp(2j * numpy.pi * h / N * A) +
-                (rix2 ** 2 - rix3 ** 2) * f2 * numpy.sinc(h * f2) *
-                numpy.exp(2j * numpy.pi * h / N * B)
+                rix3 ** 2 * (h == 0)
+                + (rix1 ** 2 - rix3 ** 2)
+                * f1
+                * numpy.sinc(h * f1)
+                * numpy.exp(2j * numpy.pi * h / N * A)
+                + (rix2 ** 2 - rix3 ** 2)
+                * f2
+                * numpy.sinc(h * f2)
+                * numpy.exp(2j * numpy.pi * h / N * B)
             )
             EPS1 = (
-                rix3 ** -2 * (h == 0) + (rix1 ** -2 - rix3 ** -2) * f1 *
-                numpy.sinc(h * f1) * numpy.exp(2j * numpy.pi * h / N * A) +
-                (rix2 ** -2 - rix3 ** -2) * f2 * numpy.sinc(h * f2) *
-                numpy.exp(2j * numpy.pi * h / N * B)
+                rix3 ** -2 * (h == 0)
+                + (rix1 ** -2 - rix3 ** -2)
+                * f1
+                * numpy.sinc(h * f1)
+                * numpy.exp(2j * numpy.pi * h / N * A)
+                + (rix2 ** -2 - rix3 ** -2)
+                * f2
+                * numpy.sinc(h * f2)
+                * numpy.exp(2j * numpy.pi * h / N * B)
             )
             return EPS, EPS1
         else:
             # anisotropic
             EPS = numpy.zeros((3, 3, 2 * hmax + 1), dtype=complex)
             EPS1 = numpy.zeros_like(EPS)
-            eps1 = numpy.squeeze(
-                self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
-            eps2 = numpy.squeeze(
-                self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
-            eps3 = numpy.squeeze(
-                self.mat3.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps1 = numpy.squeeze(self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps2 = numpy.squeeze(self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps3 = numpy.squeeze(self.mat3.epsilonTensor(wl)) / EMpy.constants.eps0
             f1 = self.dc1
             f2 = self.dc2
             h = numpy.arange(-hmax, hmax + 1)
             N = len(h)
-            A = -N*f1 / 2.
-            B = N*f2 / 2.
+            A = -N * f1 / 2.
+            B = N * f2 / 2.
             for ih, hh in enumerate(h):
                 EPS[:, :, ih] = (
-                    (eps1 - eps3) * f1 * numpy.sinc(hh * f1) *
-                    numpy.exp(2j * numpy.pi * hh / N * A) +
-                    (eps2 - eps3) * f2 * numpy.sinc(hh * f2) *
-                    numpy.exp(2j * numpy.pi * hh / N * B) +
-                    eps3 * (hh == 0)
+                    (eps1 - eps3)
+                    * f1
+                    * numpy.sinc(hh * f1)
+                    * numpy.exp(2j * numpy.pi * hh / N * A)
+                    + (eps2 - eps3)
+                    * f2
+                    * numpy.sinc(hh * f2)
+                    * numpy.exp(2j * numpy.pi * hh / N * B)
+                    + eps3 * (hh == 0)
                 )
                 EPS1[:, :, ih] = (
-                    (scipy.linalg.inv(eps1) - scipy.linalg.inv(eps3)) * f1 *
-                    numpy.sinc(hh * f1) *
-                    numpy.exp(2j * numpy.pi * hh / N * A) +
-                    (scipy.linalg.inv(eps2) - scipy.linalg.inv(eps3)) * f2 *
-                    numpy.sinc(hh * f2) *
-                    numpy.exp(2j * numpy.pi * hh / N * B) +
-                    scipy.linalg.inv(eps3) * (hh == 0)
+                    (scipy.linalg.inv(eps1) - scipy.linalg.inv(eps3))
+                    * f1
+                    * numpy.sinc(hh * f1)
+                    * numpy.exp(2j * numpy.pi * hh / N * A)
+                    + (scipy.linalg.inv(eps2) - scipy.linalg.inv(eps3))
+                    * f2
+                    * numpy.sinc(hh * f2)
+                    * numpy.exp(2j * numpy.pi * hh / N * B)
+                    + scipy.linalg.inv(eps3) * (hh == 0)
                 )
             return EPS, EPS1
 
@@ -235,23 +255,31 @@ class SymmetricDoubleGrating(object):
 
         if self.isIsotropic():
             eps = EMpy.constants.eps0 * numpy.real(
-                self.mat1.n(wl) ** 2 * self.dc1 + self.mat2.n(wl) ** 2
-                * self.dc2 + self.mat3.n(wl) ** 2 * (1 - self.dc1 - self.dc2))
+                self.mat1.n(wl) ** 2 * self.dc1
+                + self.mat2.n(wl) ** 2 * self.dc2
+                + self.mat3.n(wl) ** 2 * (1 - self.dc1 - self.dc2)
+            )
         else:
             eps1 = self.mat1.epsilonTensor(wl)[2, 2, 0]
             eps2 = self.mat2.epsilonTensor(wl)[2, 2, 0]
             eps3 = self.mat3.epsilonTensor(wl)[2, 2, 0]
             eps = numpy.real(
-                eps1 * self.dc1 + eps2 * self.dc2 +
-                eps3 * (1 - self.dc1 - self.dc2))
+                eps1 * self.dc1 + eps2 * self.dc2 + eps3 * (1 - self.dc1 - self.dc2)
+            )
 
         return eps * area / self.thickness
 
     def __str__(self):
         """Return the description of a binary grating."""
         return "(%s, %s, %s), dc1: %g, dc2: %g, pitch: %g, thickness: %g" % (
-            self.mat1, self.mat2, self.mat3, self.dc1, self.dc2, self.pitch,
-            self.thickness)
+            self.mat1,
+            self.mat2,
+            self.mat3,
+            self.dc1,
+            self.dc2,
+            self.pitch,
+            self.thickness,
+        )
 
 
 class AsymmetricDoubleGrating(SymmetricDoubleGrating):
@@ -265,7 +293,8 @@ class AsymmetricDoubleGrating(SymmetricDoubleGrating):
 
     def __init__(self, mat1, mat2, mat3, dc1, dc2, dcM, pitch, thickness):
         SymmetricDoubleGrating.__init__(
-            self, mat1, mat2, mat3, dc1, dc2, pitch, thickness)
+            self, mat1, mat2, mat3, dc1, dc2, pitch, thickness
+        )
         self.dcM = dcM
 
     def getEPSFourierCoeffs(self, wl, n, anisotropic=True):
@@ -285,28 +314,35 @@ class AsymmetricDoubleGrating(SymmetricDoubleGrating):
             A = -N * (f1 + fM) / 2.
             B = N * (f2 + fM) / 2.
             EPS = (
-                rix3 ** 2 * (h == 0) + (rix1 ** 2 - rix3 ** 2) * f1 *
-                numpy.sinc(h * f1) * numpy.exp(2j * numpy.pi * h / N * A) +
-                (rix2 ** 2 - rix3 ** 2) * f2 *
-                numpy.sinc(h * f2) * numpy.exp(2j * numpy.pi * h / N * B)
+                rix3 ** 2 * (h == 0)
+                + (rix1 ** 2 - rix3 ** 2)
+                * f1
+                * numpy.sinc(h * f1)
+                * numpy.exp(2j * numpy.pi * h / N * A)
+                + (rix2 ** 2 - rix3 ** 2)
+                * f2
+                * numpy.sinc(h * f2)
+                * numpy.exp(2j * numpy.pi * h / N * B)
             )
             EPS1 = (
-                rix3 ** -2 * (h == 0) + (rix1 ** -2 - rix3 ** -2) * f1 *
-                numpy.sinc(h * f1) * numpy.exp(2j * numpy.pi * h / N * A) +
-                (rix2 ** -2 - rix3 ** -2) * f2 * numpy.sinc(h * f2) *
-                numpy.exp(2j * numpy.pi * h / N * B)
+                rix3 ** -2 * (h == 0)
+                + (rix1 ** -2 - rix3 ** -2)
+                * f1
+                * numpy.sinc(h * f1)
+                * numpy.exp(2j * numpy.pi * h / N * A)
+                + (rix2 ** -2 - rix3 ** -2)
+                * f2
+                * numpy.sinc(h * f2)
+                * numpy.exp(2j * numpy.pi * h / N * B)
             )
             return EPS, EPS1
         else:
             # anisotropic
             EPS = numpy.zeros((3, 3, 2 * hmax + 1), dtype=complex)
             EPS1 = numpy.zeros_like(EPS)
-            eps1 = numpy.squeeze(
-                self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
-            eps2 = numpy.squeeze(
-                self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
-            eps3 = numpy.squeeze(
-                self.mat3.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps1 = numpy.squeeze(self.mat1.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps2 = numpy.squeeze(self.mat2.epsilonTensor(wl)) / EMpy.constants.eps0
+            eps3 = numpy.squeeze(self.mat3.epsilonTensor(wl)) / EMpy.constants.eps0
             f1 = self.dc1
             f2 = self.dc2
             fM = self.dcM
@@ -316,20 +352,26 @@ class AsymmetricDoubleGrating(SymmetricDoubleGrating):
             B = N * (f2 + fM) / 2.
             for ih, hh in enumerate(h):
                 EPS[:, :, ih] = (
-                    (eps1 - eps3) * f1 * numpy.sinc(hh * f1) *
-                    numpy.exp(2j * numpy.pi * hh / N * A) +
-                    (eps2 - eps3) * f2 * numpy.sinc(hh * f2) *
-                    numpy.exp(2j * numpy.pi * hh / N * B) +
-                    eps3 * (hh == 0)
+                    (eps1 - eps3)
+                    * f1
+                    * numpy.sinc(hh * f1)
+                    * numpy.exp(2j * numpy.pi * hh / N * A)
+                    + (eps2 - eps3)
+                    * f2
+                    * numpy.sinc(hh * f2)
+                    * numpy.exp(2j * numpy.pi * hh / N * B)
+                    + eps3 * (hh == 0)
                 )
                 EPS1[:, :, ih] = (
-                    (scipy.linalg.inv(eps1) - scipy.linalg.inv(eps3)) * f1 *
-                    numpy.sinc(hh * f1) *
-                    numpy.exp(2j * numpy.pi * hh / N * A) +
-                    (scipy.linalg.inv(eps2) - scipy.linalg.inv(eps3)) * f2 *
-                    numpy.sinc(hh * f2) *
-                    numpy.exp(2j * numpy.pi * hh / N * B) +
-                    scipy.linalg.inv(eps3) * (hh == 0)
+                    (scipy.linalg.inv(eps1) - scipy.linalg.inv(eps3))
+                    * f1
+                    * numpy.sinc(hh * f1)
+                    * numpy.exp(2j * numpy.pi * hh / N * A)
+                    + (scipy.linalg.inv(eps2) - scipy.linalg.inv(eps3))
+                    * f2
+                    * numpy.sinc(hh * f2)
+                    * numpy.exp(2j * numpy.pi * hh / N * B)
+                    + scipy.linalg.inv(eps3) * (hh == 0)
                 )
             return EPS, EPS1
 
@@ -338,24 +380,34 @@ class AsymmetricDoubleGrating(SymmetricDoubleGrating):
 
         if self.isIsotropic():
             eps = EMpy.constants.eps0 * numpy.real(
-                self.mat1.n(wl) ** 2 * self.dc1 + self.mat2.n(wl) ** 2 *
-                self.dc2 + self.mat3.n(wl) ** 2 * (1 - self.dc1 - self.dc2))
+                self.mat1.n(wl) ** 2 * self.dc1
+                + self.mat2.n(wl) ** 2 * self.dc2
+                + self.mat3.n(wl) ** 2 * (1 - self.dc1 - self.dc2)
+            )
         else:
             eps1 = self.mat1.epsilonTensor(wl)[2, 2, 0]
             eps2 = self.mat2.epsilonTensor(wl)[2, 2, 0]
             eps3 = self.mat3.epsilonTensor(wl)[2, 2, 0]
             eps = numpy.real(
-                eps1 * self.dc1 + eps2 * self.dc2 +
-                eps3 * (1 - self.dc1 - self.dc2))
+                eps1 * self.dc1 + eps2 * self.dc2 + eps3 * (1 - self.dc1 - self.dc2)
+            )
 
         return eps * area / self.thickness
 
     def __str__(self):
         """Return the description of a binary grating."""
-        return ("(%s, %s, %s), dc1: %g, dc2: %g, dcM: %g, "
-                "pitch: %g, thickness: %g") % (
-            self.mat1, self.mat2, self.mat3, self.dc1, self.dc2,
-            self.dcM, self.pitch, self.thickness)
+        return (
+            "(%s, %s, %s), dc1: %g, dc2: %g, dcM: %g, " "pitch: %g, thickness: %g"
+        ) % (
+            self.mat1,
+            self.mat2,
+            self.mat3,
+            self.dc1,
+            self.dc2,
+            self.dcM,
+            self.pitch,
+            self.thickness,
+        )
 
 
 class LiquidCrystalCell(object):
@@ -384,8 +436,17 @@ class LiquidCrystalCell(object):
 
     """
 
-    def __init__(self, lc, voltage, t_tot, t_anchoring, pretilt=0,
-                 totaltwist=0, nlayers=100, data_file=None):
+    def __init__(
+        self,
+        lc,
+        voltage,
+        t_tot,
+        t_anchoring,
+        pretilt=0,
+        totaltwist=0,
+        nlayers=100,
+        data_file=None,
+    ):
 
         self.lc = lc
         self.t_tot = t_tot
@@ -395,8 +456,11 @@ class LiquidCrystalCell(object):
         self.nlayers = nlayers
         self.data_file = data_file
         # thicknesses of internal layers
-        tlc_internal = (self.t_tot - 2. * self.t_anchoring) / \
-            (self.nlayers - 2.) * numpy.ones(self.nlayers - 2)
+        tlc_internal = (
+            (self.t_tot - 2. * self.t_anchoring)
+            / (self.nlayers - 2.)
+            * numpy.ones(self.nlayers - 2)
+        )
         # thicknesses of layers
         self.tlc = numpy.r_[self.t_anchoring, tlc_internal, self.t_anchoring]
         # internal sample points
@@ -404,8 +468,8 @@ class LiquidCrystalCell(object):
         # normalized sample points: at the center of internal layers, plus the
         # boundaries (i.e. the anchoring layers)
         self.normalized_sample_points = numpy.r_[
-            0, (lhs[1:] + lhs[:-1]) / 2. / (self.t_tot - 2 * self.t_anchoring),
-            1]
+            0, (lhs[1:] + lhs[:-1]) / 2. / (self.t_tot - 2 * self.t_anchoring), 1
+        ]
         tmp = numpy.r_[0, numpy.cumsum(self.tlc)]
         self.sample_points = .5 * (tmp[1:] + tmp[:-1])
         # finally, apply voltage
@@ -453,28 +517,35 @@ class LiquidCrystalCell(object):
         ezz = e0 * (epslow + deleps * sintheta1 ** 2)
 
         # maple generated (see lc3k.mws)
-        ddtheta2dz = costheta1 * sintheta1 * (
-            K1122 * dtheta2dz ** 2 +
-            2 * K3322 * costheta1 ** 2 * dphi2dz ** 2 -
-            K3322 * dtheta2dz ** 2 -
-            K22 * dphi2dz ** 2 -
-            e0 * deleps * du2dz ** 2 +
-            2 * q0 * K22 * dphi2dz -
-            K3322 * dphi2dz ** 2
-        ) / (
-            K1122 * costheta1 ** 2 -
-            K3322 * costheta1 ** 2 +
-            K22 + K3322
+        ddtheta2dz = (
+            costheta1
+            * sintheta1
+            * (
+                K1122 * dtheta2dz ** 2
+                + 2 * K3322 * costheta1 ** 2 * dphi2dz ** 2
+                - K3322 * dtheta2dz ** 2
+                - K22 * dphi2dz ** 2
+                - e0 * deleps * du2dz ** 2
+                + 2 * q0 * K22 * dphi2dz
+                - K3322 * dphi2dz ** 2
+            )
+            / (K1122 * costheta1 ** 2 - K3322 * costheta1 ** 2 + K22 + K3322)
         )
-        ddphi2dz = 2 * sintheta1 * dtheta2dz * (
-            2 * K3322 * costheta1 ** 2 * dphi2dz -
-            K22 * dphi2dz +
-            q0 * K22 -
-            K3322 * dphi2dz
-        ) / costheta1 / (K3322 * costheta1 ** 2 - K22 - K3322)
+        ddphi2dz = (
+            2
+            * sintheta1
+            * dtheta2dz
+            * (
+                2 * K3322 * costheta1 ** 2 * dphi2dz
+                - K22 * dphi2dz
+                + q0 * K22
+                - K3322 * dphi2dz
+            )
+            / costheta1
+            / (K3322 * costheta1 ** 2 - K22 - K3322)
+        )
 
-        ddu2dz = -2 * e0 * deleps * sintheta1 * \
-            costheta1 * dtheta2dz * du2dz / ezz
+        ddu2dz = -2 * e0 * deleps * sintheta1 * costheta1 * dtheta2dz * du2dz / ezz
 
         return numpy.array([ddtheta2dz, ddphi2dz, ddu2dz])
 
@@ -483,24 +554,32 @@ class LiquidCrystalCell(object):
         U{http://www.ee.ucl.ac.uk/~rjames/modelling/constant-order/oned/}."""
 
         theta2, dtheta2dz, phi2, dphi2dz, u2, du2dz = f
-        return numpy.array([theta2[0] - self.pretilt,
-                            phi2[1] - 0,
-                            u2[2] - 0,
-                            theta2[3] - self.pretilt,
-                            phi2[4] - self.totaltwist,
-                            u2[5] - self.voltage])
+        return numpy.array(
+            [
+                theta2[0] - self.pretilt,
+                phi2[1] - 0,
+                u2[2] - 0,
+                theta2[3] - self.pretilt,
+                phi2[4] - self.totaltwist,
+                u2[5] - self.voltage,
+            ]
+        )
 
     def __ic_nosplay(self, z):
         """Inspiration from:
         U{http://www.ee.ucl.ac.uk/~rjames/modelling/constant-order/oned/}."""
 
         self.maxtilt = 90 * numpy.pi / 180 - self.pretilt
-        init = numpy.array([self.pretilt + self.maxtilt * 4 * z * (1 - z),
-                            self.maxtilt * 4 * (1 - 2 * z),
-                            self.totaltwist * z,
-                            self.totaltwist * numpy.ones_like(z),
-                            self.voltage * z,
-                            self.voltage * numpy.ones_like(z)])
+        init = numpy.array(
+            [
+                self.pretilt + self.maxtilt * 4 * z * (1 - z),
+                self.maxtilt * 4 * (1 - 2 * z),
+                self.totaltwist * z,
+                self.totaltwist * numpy.ones_like(z),
+                self.voltage * z,
+                self.voltage * numpy.ones_like(z),
+            ]
+        )
 
         return init, self.__ode_3k(z, init)
 
@@ -519,10 +598,16 @@ class LiquidCrystalCell(object):
         degrees = numpy.array([2, 2, 2])
 
         solution = colnew.solve(
-            boundary_points, degrees, self.__ode_3k, self.__bc_nosplay,
-            is_linear=False, initial_guess=self.__ic_nosplay,
-            tolerances=tol, vectorized=True,
-            maximum_mesh_size=1000)
+            boundary_points,
+            degrees,
+            self.__ode_3k,
+            self.__bc_nosplay,
+            is_linear=False,
+            initial_guess=self.__ic_nosplay,
+            tolerances=tol,
+            vectorized=True,
+            maximum_mesh_size=1000,
+        )
 
         self.bvp_solution = solution
 
@@ -568,22 +653,32 @@ class LiquidCrystalCell(object):
         for a, t in zip(EMpy.utils.deg2rad(self.angles), self.tlc):
             epsT = EMpy.materials.EpsilonTensor(
                 epsilon_tensor_const=EMpy.utils.euler_rotate(
-                    numpy.diag([self.lc.nE,
-                                self.lc.nO,
-                                self.lc.nO]) ** 2,
-                    0., numpy.pi / 2., numpy.pi / 2. - a) * EMpy.constants.eps0,
+                    numpy.diag([self.lc.nE, self.lc.nO, self.lc.nO]) ** 2,
+                    0.,
+                    numpy.pi / 2.,
+                    numpy.pi / 2. - a,
+                )
+                * EMpy.constants.eps0,
                 epsilon_tensor_known={
                     0: EMpy.utils.euler_rotate(
-                        numpy.diag([self.lc.nE_electrical,
-                                    self.lc.nO_electrical,
-                                    self.lc.nO_electrical]) ** 2,
-                        0., numpy.pi / 2.,
-                        numpy.pi / 2. - a) * EMpy.constants.eps0,
-                }
+                        numpy.diag(
+                            [
+                                self.lc.nE_electrical,
+                                self.lc.nO_electrical,
+                                self.lc.nO_electrical,
+                            ]
+                        )
+                        ** 2,
+                        0.,
+                        numpy.pi / 2.,
+                        numpy.pi / 2. - a,
+                    )
+                    * EMpy.constants.eps0
+                },
             )
             m.append(
-                Layer(EMpy.materials.AnisotropicMaterial(
-                    'LC', epsilon_tensor=epsT), t))
+                Layer(EMpy.materials.AnisotropicMaterial("LC", epsilon_tensor=epsT), t)
+            )
 
         return Multilayer(m)
 
@@ -598,10 +693,17 @@ class LiquidCrystalCell(object):
 
     def __str__(self):
         """Return the description of a LiquidCrystal."""
-        return ("datafile: %s, voltage: %g, t_tot: %g, "
-                "t_anchoring: %g, (nO, nE) = (%g, %g)") % (
-                    self.data_file, self.voltage, self.t_tot, self.t_anchoring,
-                    self.lc.nO, self.lc.nE)
+        return (
+            "datafile: %s, voltage: %g, t_tot: %g, "
+            "t_anchoring: %g, (nO, nE) = (%g, %g)"
+        ) % (
+            self.data_file,
+            self.voltage,
+            self.t_tot,
+            self.t_anchoring,
+            self.lc.nO,
+            self.lc.nE,
+        )
 
 
 class Multilayer(object):
@@ -699,14 +801,13 @@ class Multilayer(object):
         if self.__len__() == 0:
             list_str = "<emtpy>"
         else:
-            list_str = '\n'.join([
-                '%d: %s' % (il, l.__str__()) for il, l in enumerate(self.data)
-            ])
-        return 'Multilayer\n----------\n' + list_str
+            list_str = "\n".join(
+                ["%d: %s" % (il, l.__str__()) for il, l in enumerate(self.data)]
+            )
+        return "Multilayer\n----------\n" + list_str
 
 
 class Slice(Multilayer):
-
     def __init__(self, width, *argv):
         Multilayer.__init__(self, *argv)
         self.width = width
@@ -731,7 +832,7 @@ class Slice(Multilayer):
         try:
             import pylab
         except ImportError:
-            warning('no pylab installed')
+            warning("no pylab installed")
             return
         y0 = 0
         # ytot = sum([l.thickness for l in self])
@@ -740,19 +841,18 @@ class Slice(Multilayer):
             n = l.mat.n(wl)
             r = 1. - (1. * (n - nmin) / (nmax - nmin))
             pylab.fill(
-                [x0, x1, x1, x0], [y0, y0, y1, y1], ec='yellow', fc=(r, r, r),
-                alpha=.5)
+                [x0, x1, x1, x0], [y0, y0, y1, y1], ec="yellow", fc=(r, r, r), alpha=.5
+            )
             y0 = y1
-        pylab.axis('image')
+        pylab.axis("image")
 
     def __str__(self):
-        return 'width = %e\n%s' % (self.width, Multilayer.__str__(self))
+        return "width = %e\n%s" % (self.width, Multilayer.__str__(self))
 
 
 class CrossSection(list):
-
     def __str__(self):
-        return '\n'.join('%s' % s for s in self)
+        return "\n".join("%s" % s for s in self)
 
     def widths(self):
         return numpy.array([s.width for s in self])
@@ -780,14 +880,14 @@ class CrossSection(list):
         if numpy.isscalar(nx_per_region):
             nx = (nx_per_region,) * nxregions
         elif len(nx_per_region) != nxregions:
-            raise ValueError('wrong nx_per_region dim')
+            raise ValueError("wrong nx_per_region dim")
         else:
             nx = nx_per_region
 
         if numpy.isscalar(ny_per_region):
             ny = (ny_per_region,) * nyregions
         elif len(ny_per_region) != nyregions:
-            raise ValueError('wrong ny_per_region dim')
+            raise ValueError("wrong ny_per_region dim")
         else:
             ny = ny_per_region
 
@@ -820,7 +920,7 @@ class CrossSection(list):
         if numpy.isscalar(x) and numpy.isscalar(y):
             return self.find_slice(x).find_layer(y).mat.n(wl) ** 2
         else:
-            raise ValueError('only scalars, please!')
+            raise ValueError("only scalars, please!")
 
     def epsfunc(self, x, y, wl):
         eps = numpy.ones((len(x), len(y)), dtype=complex)
@@ -833,7 +933,7 @@ class CrossSection(list):
         try:
             import pylab
         except ImportError:
-            warning('no pylab installed')
+            warning("no pylab installed")
             return
         x0 = 0
         ns = [[l.mat.n(wl) for l in s] for s in self]
@@ -843,11 +943,10 @@ class CrossSection(list):
             x1 = x0 + s.width
             s.plot(x0, x1, nmin, nmax, wl=wl)
             x0 = x1
-        pylab.axis('image')
+        pylab.axis("image")
 
 
 class Peak(object):
-
     def __init__(self, x, y, idx, x0, y0, xFWHM_1, xFWHM_2):
         self.x = x
         self.y = y
@@ -859,8 +958,14 @@ class Peak(object):
         self.FWHM = numpy.abs(xFWHM_2 - xFWHM_1)
 
     def __str__(self):
-        return '(%g, %g) [%d, (%g, %g)] FWHM = %s' % (
-            self.x, self.y, self.idx, self.x0, self.y0, self.FWHM)
+        return "(%g, %g) [%d, (%g, %g)] FWHM = %s" % (
+            self.x,
+            self.y,
+            self.idx,
+            self.x0,
+            self.y0,
+            self.FWHM,
+        )
 
 
 def deg2rad(x):
@@ -899,20 +1004,29 @@ def euler_rotate(X, phi, theta, psi):
     see http://mathworld.wolfram.com/EulerAngles.html
     """
 
-    A = numpy.array([
-        [numpy.cos(psi) * numpy.cos(phi) -
-         numpy.cos(theta) * numpy.sin(phi) * numpy.sin(psi),
-         -numpy.sin(psi) * numpy.cos(phi) -
-         numpy.cos(theta) * numpy.sin(phi) * numpy.cos(psi),
-         numpy.sin(theta) * numpy.sin(phi)],
-        [numpy.cos(psi) * numpy.sin(phi) +
-         numpy.cos(theta) * numpy.cos(phi) * numpy.sin(psi),
-         -numpy.sin(psi) * numpy.sin(phi) +
-         numpy.cos(theta) * numpy.cos(phi) * numpy.cos(psi),
-         -numpy.sin(theta) * numpy.cos(phi)],
-        [numpy.sin(theta) * numpy.sin(psi),
-         numpy.sin(theta) * numpy.cos(psi), numpy.cos(theta)]
-    ])
+    A = numpy.array(
+        [
+            [
+                numpy.cos(psi) * numpy.cos(phi)
+                - numpy.cos(theta) * numpy.sin(phi) * numpy.sin(psi),
+                -numpy.sin(psi) * numpy.cos(phi)
+                - numpy.cos(theta) * numpy.sin(phi) * numpy.cos(psi),
+                numpy.sin(theta) * numpy.sin(phi),
+            ],
+            [
+                numpy.cos(psi) * numpy.sin(phi)
+                + numpy.cos(theta) * numpy.cos(phi) * numpy.sin(psi),
+                -numpy.sin(psi) * numpy.sin(phi)
+                + numpy.cos(theta) * numpy.cos(phi) * numpy.cos(psi),
+                -numpy.sin(theta) * numpy.cos(phi),
+            ],
+            [
+                numpy.sin(theta) * numpy.sin(psi),
+                numpy.sin(theta) * numpy.cos(psi),
+                numpy.cos(theta),
+            ],
+        ]
+    )
     return numpy.dot(A, numpy.dot(X, scipy.linalg.inv(A)))
 
 
@@ -959,7 +1073,7 @@ def group_delay_and_dispersion(wls, y):
 
     # check for good input
     if wls.shape != y.shape:
-        raise ValueError('wls and y must have the same shape.')
+        raise ValueError("wls and y must have the same shape.")
 
     f = EMpy.constants.c / wls
 
@@ -974,8 +1088,7 @@ def group_delay_and_dispersion(wls, y):
     tau = -.5 / numpy.pi * numpy.diff(phi) / df * 1E12
 
     # dispersion in ps/nm
-    Dpsnm = -.5 / numpy.pi / cnmps * \
-        f[1:-1] ** 2 * numpy.diff(phi, 2) / df[0:-1] ** 2
+    Dpsnm = -.5 / numpy.pi / cnmps * f[1:-1] ** 2 * numpy.diff(phi, 2) / df[0:-1] ** 2
 
     return phi, tau, Dpsnm
 
@@ -994,22 +1107,22 @@ def rix2losses(n, wl):
 def loss_cm2rix(n_real, alpha_cm1, wl):
     """Return complex refractive index, given real index (n_real), absorption coefficient (alpha_cm1) in cm^-1, and wavelength (wl) in meters.
     Do not pass more than one argument as array, will return erroneous result."""
-    ni = 100 * alpha_cm1 * wl /(numpy.pi * 4)
-    return (n_real - 1j*ni)
+    ni = 100 * alpha_cm1 * wl / (numpy.pi * 4)
+    return n_real - 1j * ni
 
 
 def loss_m2rix(n_real, alpha_m1, wl):
     """Return complex refractive index, given real index (n_real), absorption coefficient (alpha_m1) in m^-1, and wavelength (wl) in meters.
     Do not pass more than one argument as array, will return erroneous result."""
-    ni = alpha_m1 * wl /(numpy.pi * 4)
-    return (n_real - 1j*ni)
+    ni = alpha_m1 * wl / (numpy.pi * 4)
+    return n_real - 1j * ni
 
 
 def loss_dBcm2rix(n_real, alpha_dBcm1, wl):
     """Return complex refractive index, given real index (n_real), absorption coefficient (alpha_dBcm1) in dB/cm, and wavelength (wl) in meters.
     Do not pass more than one argument as array, will return erroneous result."""
     ni = 10 * alpha_dBcm1 * wl / (numpy.log10(numpy.exp(1)) * 4 * numpy.pi)
-    return (n_real - 1j*ni)
+    return n_real - 1j * ni
 
 
 def wl2f(wl0, dwl):
@@ -1019,7 +1132,7 @@ def wl2f(wl0, dwl):
     f1 = EMpy.constants.c / wl2
     f2 = EMpy.constants.c / wl1
     f0 = (f1 + f2) / 2.
-    df = (f2 - f1)
+    df = f2 - f1
     return f0, df
 
 
@@ -1054,7 +1167,8 @@ def find_peaks(x, y, threshold=1e-6):
         # look around the candidate
         xtol = (x.max() - x.min()) * 1e-6
         xopt = scipy.optimize.fminbound(
-            absdy, x[idx - 1], x[idx + 1], xtol=xtol, disp=False)
+            absdy, x[idx - 1], x[idx + 1], xtol=xtol, disp=False
+        )
         yopt = scipy.interpolate.splev(xopt, tck)
 
         if yopt > threshold * y.max():
@@ -1127,8 +1241,14 @@ def centered2d(x):
 
 
 def blackbody(f, T):
-    return 2 * EMpy.constants.h * f ** 3 / (EMpy.constants.c ** 2) * 1. / (
-        numpy.exp(EMpy.constants.h * f / (EMpy.constants.k * T)) - 1)
+    return (
+        2
+        * EMpy.constants.h
+        * f ** 3
+        / (EMpy.constants.c ** 2)
+        * 1.
+        / (numpy.exp(EMpy.constants.h * f / (EMpy.constants.k * T)) - 1)
+    )
 
 
 def warning(s):
@@ -1138,7 +1258,7 @@ def warning(s):
     :type s: str
     :rtype : str
     """
-    print('WARNING --- {}'.format(s))
+    print("WARNING --- {}".format(s))
 
 
 class ProgressBar(object):
@@ -1187,34 +1307,41 @@ class ProgressBar(object):
         # Build a progress bar with an arrow of equal signs; special cases for
         # empty and full
         if numHashes == 0:
-            self.progBar = '[>%s]' % (' ' * (allFull - 1))
+            self.progBar = "[>%s]" % (" " * (allFull - 1))
         elif numHashes == allFull:
-            self.progBar = '[%s]' % ('=' * allFull)
+            self.progBar = "[%s]" % ("=" * allFull)
         else:
-            self.progBar = '[%s>%s]' % ('=' * (numHashes - 1),
-                                        ' ' * (allFull - numHashes))
+            self.progBar = "[%s>%s]" % (
+                "=" * (numHashes - 1),
+                " " * (allFull - numHashes),
+            )
 
         # figure out where to put the percentage, roughly centered
         percentPlace = (len(self.progBar) / 2) - len(str(percentDone))
-        percentString = ' ' + str(percentDone) + '% '
+        percentString = " " + str(percentDone) + "% "
 
         elapsed_time = time.time() - self.start_time
 
         # slice the percentage into the bar
-        self.progBar = ''.join([self.progBar[0:percentPlace], percentString,
-                                self.progBar[
-                                    percentPlace + len(percentString):],
-                                ])
+        self.progBar = "".join(
+            [
+                self.progBar[0:percentPlace],
+                percentString,
+                self.progBar[percentPlace + len(percentString) :],
+            ]
+        )
 
         if percentDone > 0:
-            self.progBar += ' %6ds / %6ds' % (
-                int(elapsed_time), int(elapsed_time * (100. / percentDone - 1)))
+            self.progBar += " %6ds / %6ds" % (
+                int(elapsed_time),
+                int(elapsed_time * (100. / percentDone - 1)),
+            )
 
     def update(self, value, every=1):
         """ Updates the amount, and writes to stdout. Prints a carriage return
         first, so it will overwrite the current line in stdout."""
         if value % every == 0 or value >= self.max:
-            print('\r', end=' ')
+            print("\r", end=" ")
             self.updateAmount(value)
             sys.stdout.write(self.progBar)
             sys.stdout.flush()

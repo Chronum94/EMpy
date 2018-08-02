@@ -12,7 +12,8 @@ iso_layers = EMpy.utils.Multilayer()
 for i in xrange(n.size):
     n0 = EMpy.materials.RefractiveIndex(n[i])
     iso_layers.append(
-        EMpy.utils.Layer(EMpy.materials.IsotropicMaterial('mat', n0=n0), d[i]))
+        EMpy.utils.Layer(EMpy.materials.IsotropicMaterial("mat", n0=n0), d[i])
+    )
 
 # define incident wave plane
 theta_inc = EMpy.utils.deg2rad(10.)
@@ -24,13 +25,19 @@ solution_iso = tm.solve(wls)
 
 # plot
 pylab.figure()
-pylab.plot(wls, 10 * numpy.log10(solution_iso.Rs), 'rx-',
-           wls, 10*numpy.log10(solution_iso.Rp), 'g.-')
-pylab.legend(('Rs', 'Rp'))
-pylab.title('Single Layer Anti-Reflection Coating')
-pylab.xlabel('wavelength /m')
-pylab.ylabel('Power /dB')
+pylab.plot(
+    wls,
+    10 * numpy.log10(solution_iso.Rs),
+    "rx-",
+    wls,
+    10 * numpy.log10(solution_iso.Rp),
+    "g.-",
+)
+pylab.legend(("Rs", "Rp"))
+pylab.title("Single Layer Anti-Reflection Coating")
+pylab.xlabel("wavelength /m")
+pylab.ylabel("Power /dB")
 pylab.grid()
 pylab.xlim(wls.min(), wls.max())
-pylab.savefig(__file__ + '.png')
+pylab.savefig(__file__ + ".png")
 pylab.show()
