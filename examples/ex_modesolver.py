@@ -1,9 +1,10 @@
 """Fully vectorial finite-difference mode solver example."""
 
-import numpy
+import numpy as np
 import EMpy
-import pylab
+import matplotlib.pyplot as plt
 
+plt.rcParams['image.cmap'] = 'coolwarm'
 
 def epsfunc(x_, y_):
     """Return a matrix describing a 2d material.
@@ -12,17 +13,17 @@ def epsfunc(x_, y_):
     :param y_: y values
     :return: 2d-matrix
     """
-    xx, yy = numpy.meshgrid(x_, y_)
-    return numpy.where(
-        (numpy.abs(xx.T - 1.24e-6) <= .24e-6) * (numpy.abs(yy.T - 1.11e-6) <= .11e-6),
+    xx, yy = np.meshgrid(x_, y_)
+    return np.where(
+        (np.abs(xx.T - 1.24e-6) <= .24e-6) * (np.abs(yy.T - 1.11e-6) <= .11e-6),
         3.4757 ** 2,
         1.446 ** 2,
     )
 
 
 wl = 1.55e-6
-x = numpy.linspace(0, 2.48e-6, 125)
-y = numpy.linspace(0, 2.22e-6, 112)
+x = np.linspace(0, 2.48e-6, 125)
+y = np.linspace(0, 2.22e-6, 112)
 
 neigs = 2
 tol = 1e-8
@@ -32,36 +33,36 @@ solver = EMpy.modesolvers.FD.VFDModeSolver(wl, x, y, epsfunc, boundary).solve(
     neigs, tol
 )
 
-fig = pylab.figure()
+fig = plt.figure()
 
-fig.add_subplot(1, 3, 1)
-Ex = numpy.transpose(solver.modes[0].get_field("Ex", x, y))
-pylab.contourf(x, y, abs(Ex), 50)
-pylab.title("Ex")
+fig.add_subplot(2, 3, 1)
+Ex = np.transpose(solver.modes[0].get_field("Ex", x, y))
+plt.contourf(x, y, abs(Ex), 50)
+plt.title("Ex")
 
-fig.add_subplot(1, 3, 2)
-Ey = numpy.transpose(solver.modes[0].get_field("Ey", x, y))
-pylab.contourf(x, y, abs(Ey), 50)
-pylab.title("Ey")
+fig.add_subplot(2, 3, 2)
+Ey = np.transpose(solver.modes[0].get_field("Ey", x, y))
+plt.contourf(x, y, abs(Ey), 50)
+plt.title("Ey")
 
-fig.add_subplot(1, 3, 3)
-Ez = numpy.transpose(solver.modes[0].get_field("Ez", x, y))
-pylab.contourf(x, y, abs(Ez), 50)
-pylab.title("Ez")
+fig.add_subplot(2, 3, 3)
+Ez = np.transpose(solver.modes[0].get_field("Ez", x, y))
+plt.contourf(x, y, abs(Ez), 50)
+plt.title("Ez")
 
-fig.add_subplot(1, 3, 1)
-Hx = numpy.transpose(solver.modes[0].get_field("Hx", x, y))
-pylab.contourf(x, y, abs(Hx), 50)
-pylab.title("Hx")
+fig.add_subplot(2, 3, 4)
+Hx = np.transpose(solver.modes[0].get_field("Hx", x, y))
+plt.contourf(x, y, abs(Hx), 50)
+plt.title("Hx")
 
-fig.add_subplot(1, 3, 2)
-Hy = numpy.transpose(solver.modes[0].get_field("Hy", x, y))
-pylab.contourf(x, y, abs(Hy), 50)
-pylab.title("Hy")
+fig.add_subplot(2, 3, 5)
+Hy = np.transpose(solver.modes[0].get_field("Hy", x, y))
+plt.contourf(x, y, abs(Hy), 50)
+plt.title("Hy")
 
-fig.add_subplot(1, 3, 3)
-Hz = numpy.transpose(solver.modes[0].get_field("Hz", x, y))
-pylab.contourf(x, y, abs(Hz), 50)
-pylab.title("Hz")
+fig.add_subplot(2, 3, 6)
+Hz = np.transpose(solver.modes[0].get_field("Hz", x, y))
+plt.contourf(x, y, abs(Hz), 50)
+plt.title("Hz")
 
-pylab.show()
+plt.show()
