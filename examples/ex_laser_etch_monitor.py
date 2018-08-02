@@ -25,8 +25,8 @@ from copy import copy, deepcopy
 # for progress bar (sys.stdout)
 import sys
 
-import pylab
-import numpy
+import matplotlib.pyplot as plt
+import numpy as np
 
 import EMpy
 
@@ -40,7 +40,7 @@ wl_lasermon = 670e-9
 # how much to etch before acquiring new laser monitor reflectivity
 EtchStep = 10e-9
 
-wls = numpy.array([wl_lasermon - 1e-9, wl_lasermon, wl_lasermon + 1e-9])
+wls = np.array([wl_lasermon - 1e-9, wl_lasermon, wl_lasermon + 1e-9])
 theta_inc = EMpy.utils.deg2rad(0)  # incidence angle
 
 
@@ -50,14 +50,14 @@ theta_inc = EMpy.utils.deg2rad(0)  # incidence angle
 def find_nearest(a, a0):
     """Return element in ndArray `a` that has value closest to the
     scalar value `a0`."""
-    idx = numpy.abs(a - a0).argmin()
+    idx = np.abs(a - a0).argmin()
     return a.flat[idx]
 
 
 def arg_find_nearest(a, a0):
     """Return index to element in ndArray `a` that has value closest
     to the scalar value `a0`."""
-    idx = numpy.abs(a - a0).argmin()
+    idx = np.abs(a - a0).argmin()
     return idx
 
 
@@ -66,7 +66,7 @@ def count_noninf(multilayer):
     object."""
     out = 0
     for x in multilayer:
-        out = out + 0 if numpy.isinf(x.thickness) else out + 1
+        out = out + 0 if np.isinf(x.thickness) else out + 1
     return out
 
 
@@ -74,7 +74,7 @@ def arg_inf(multilayer):
     """Return index to layers with infinite-thickness in an EMpy Multilayer object."""
     out = []
     for ix, x in enumerate(multilayer):
-        if numpy.isinf(x.thickness):
+        if np.isinf(x.thickness):
             out.append(ix)
     return out
 
@@ -120,14 +120,14 @@ d_AlGaAs_DBR = wl_center / n_AlGaAs95(wl_center).real / 4
 Layer = EMpy.utils.Layer  # shortcut
 
 # define the layers (material, thickness) we will use in the stack:
-air = Layer(mat_air, numpy.inf)
+air = Layer(mat_air, np.inf)
 SiN = Layer(mat_SiN, 300e-9)
 GaAs_DBR = Layer(mat_GaAs, d_GaAs_DBR)
 AlGaAs_DBR = Layer(mat_AlGaAs95, d_AlGaAs_DBR)
 GaAs_core = Layer(mat_GaAs, 551.75e-9)
 AlGaAs_spacer = Layer(mat_AlGaAs95, 500e-9)
 GaAs_spacer = Layer(mat_GaAs, 300e-9)
-GaAs_substrate = Layer(mat_GaAs, numpy.inf)
+GaAs_substrate = Layer(mat_GaAs, np.inf)
 
 # Use lists to enable periodic structures etc.
 #   Make sure to include infinite-thickness layers on ends
@@ -181,7 +181,7 @@ while go is True:
             indexno = idxtemp
         else:
             # point to non-infinite layers for etching:
-            while numpy.isinf(layers[idxtemp].thickness):
+            while np.isinf(layers[idxtemp].thickness):
                 idxtemp = idxtemp + 1  # assumes etching from 1st layer in list
             indexno = idxtemp
 
@@ -221,19 +221,19 @@ print("\n")
 
 
 # Plots:
-fig1, [ax1, ax2] = pylab.subplots(nrows=2, ncols=1, sharex=True)
+fig1, [ax1, ax2] = plt.subplots(nrows=2, ncols=1, sharex=True)
 ax1.set_title(r"Reflectivity at $\lambda = %0.1fnm$" % (wls[wlidx] * 1e9))
 
 # plot refractive index vs. depth
-ax1.plot(numpy.array(EtchSteps) * 1e9, RefrIdx, "-g")
+ax1.plot(np.array(EtchSteps) * 1e9, RefrIdx, "-g")
 ax1.set_ylabel("Refractive Index")
 ax1.grid(True)
 
 # plot reflectivity vs. depth
-ax2.plot(numpy.array(EtchSteps) * 1e9, numpy.array(Rlaser) * 100, "-")
+ax2.plot(np.array(EtchSteps) * 1e9, np.array(Rlaser) * 100, "-")
 ax2.set_ylabel("Laser Reflectivity (%)")
 ax2.set_xlabel("Etch Depth (nm)")
 ax2.grid(True)
 
 fig1.show()
-pylab.show()
+plt.show()
